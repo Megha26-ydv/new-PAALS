@@ -1,0 +1,15 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Local settings and secrets (copy .env.example to .env)
+.env
+
+# SQLite database: 150 MB, over GitHub's 100 MB file limit, and rebuilt automatically
+# on first start from the seed generator and the Kaggle CSVs in data/kaggle/
+database/*.db
+database/*.db-journal
+
+# Editor
+.vscode/

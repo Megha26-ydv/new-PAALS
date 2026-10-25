@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}Purchase Orders{% endblock %}
+{% block page_title %}Purchase Orders{% endblock %}
+{% block page_sub %}Synthetic seed + Kaggle DataCo orders · showing up to 350{% endblock %}
+
+{% block content %}
+<div style="display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap;">
+  <div class="tabs" style="margin-bottom:0;">
+    <div class="tab active" onclick="setStatus('', this)">All</div>
+    <div class="tab" onclick="setStatus('in_transit', this)">In Transit</div>
+    <div class="tab" onclick="setStatus('confirmed', this)">Confirmed</div>
+    <div class="tab" onclick="setStatus('processing', this)">Processing</div>
+    <div class="tab" onclick="setStatus('delivered', this)">Delivered</div>
+  </div>
+
+  <select id="source-filter" onchange="loadPOs()"
+    style="background:var(--bg-raised);border:1px solid var(--border);color:var(--text-secondary);
+           padding:6px 10px;border-radius:var(--radius);font-size:12px;outline:none;">
+    <option value="">All Sources</option>
+    <option value="synthetic">Synthetic Seed</option>
+    <option value="dataco">Kaggle · DataCo</option>
+    <option value="scms">Kaggle · USAID SCMS</option>
+  </select>
+
+  <input id="search-input" type="text" placeholder="Search supplier or PO ID…"
+    oninput="applyFilters()"
+    style="background:var(--bg-raised);border:1px solid var(--border);color:var(--text-primary);
+           padding:6px 12px;border-radius:var(--radius);font-size:12px;outline:none;
+           min-width:220px;flex:1;">
+
+  <span style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);"
+        id="row-count">—</span>
+</div>
+
+<!-- Summary strip -->
+<div class="metrics-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px;">
+  <div class="metric-card blue">
+    <div class="metric-label">In Transit</div>
+    <div class="metric-value" id="m-transit">—</div>
+    <div class="metric-sub">Active shipments</div>
+  </div>
+  <div class="metric-card medium">
+    <div class="metric-label">Confirmed</div>
+    <div class="metric-value" id="m-confirmed">—</div>
+    <div class="metric-sub">Awaiting dispatch</div>
+  </div>
+  <div class="metric-card high">
+    <div class="metric-label">Processing</div>
+    <div class="metric-value" id="m-processing">—</div>
+    <div class="metric-sub">In supplier queue</div>
+  </div>
+  <div class="metric-card low">
+    <div class="metric-label">Delivered</div>
+    <div class="metric-value" id="m-delivered">—</div>
+    <div class="metric-sub">Completed orders</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <span class="card-title" id="table-label">All Purchase Orders</span>
+    <a href="/deviations" class="btn btn-ghost btn-sm">View deviations →</a>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>PO ID</th>
+          <th>Supplier</th>
+          <th>Status</th>
+          <th>Value (USD)</th>
+          <th>Currency</th>
+          <th>Incoterm</th>
+          <th>Created</th>
+          <th>Expected Delivery</th>
+          <th>Actual Delivery</th>
+          <th>Line Items</th>
+          <th>Deviation</th>
+        </tr>
+      </thead>
+      <tbody id="po-tbody">
+        <tr><td colspan="11" style="padding:28px;text-align:center;color:var(--text-muted);">Loading…</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ asset('js/purchase_orders.js') }}"></script>
+{% endblock %}

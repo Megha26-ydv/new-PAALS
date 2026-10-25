@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Executive Dashboard{% endblock %}
+{% block page_sub %}Operational overview · Auto-refreshes every 60s{% endblock %}
+
+{% block content %}
+<div class="metrics-grid" id="metrics-row">
+  <div class="metric-card critical">
+    <div class="metric-label">Active Deviations</div>
+    <div class="metric-value" id="m-deviations">—</div>
+    <div class="metric-sub" id="m-dev-sub">Loading...</div>
+  </div>
+  <div class="metric-card high">
+    <div class="metric-label">Pending Approvals</div>
+    <div class="metric-value" id="m-approvals">—</div>
+    <div class="metric-sub">Awaiting operations review</div>
+  </div>
+  <div class="metric-card medium">
+    <div class="metric-label">Financial Exposure</div>
+    <div class="metric-value currency" id="m-exposure">—</div>
+    <div class="metric-sub">Unresolved deviations</div>
+  </div>
+  <div class="metric-card blue">
+    <div class="metric-label">Agent Actions Today</div>
+    <div class="metric-value" id="m-actions">—</div>
+    <div class="metric-sub">Recommendations generated</div>
+  </div>
+</div>
+
+<!-- Analytics: smooth trend chart + severity donut -->
+<div class="chart-grid">
+  <div class="card">
+    <div class="card-body">
+      <div class="chart-head">
+        <div>
+          <div class="card-title" id="trend-title">Sales analytics</div>
+          <div class="chart-kpi" id="trend-kpi" style="margin-top:10px;">—</div>
+          <div class="chart-kpi-sub" id="trend-sub">Loading…</div>
+        </div>
+        <div class="seg" id="trend-seg" role="tablist" aria-label="Dataset">
+          <span class="seg-pill"></span>
+          <button class="on" data-src="dataco" role="tab">DataCo sales</button>
+          <button data-src="scms" role="tab">SCMS shipments</button>
+        </div>
+      </div>
+      <div class="chart-wrap loading" id="trend-chart"><div class="chart-tip" id="trend-tip"></div></div>
+      <div class="chart-legend">
+        <span><i style="background:var(--accent-blue)"></i>Monthly value (USD)</span>
+        <span><i style="background:var(--high)"></i>Late-delivery rate</span>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-body">
+      <div class="card-title">Severity mix</div>
+      <div class="donut-wrap" id="sev-donut">
+        <div class="donut-center"><div class="n" id="donut-n">—</div><div class="l">active deviations</div></div>
+      </div>
+      <div class="donut-list" id="donut-list"></div>
+    </div>
+  </div>
+</div>
+
+<div class="grid-sidebar" style="margin-bottom: 16px;">
+  <!-- Live Event Feed -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">Live Event Feed</span>
+      <span class="badge blue" id="feed-status">CONNECTING</span>
+    </div>
+    <div class="event-feed" id="event-feed">
+      <div style="padding:20px;color:var(--text-muted);font-size:12px;text-align:center;">
+        Establishing connection...
+      </div>
+    </div>
+  </div>
+
+  <!-- Supplier Risk by Region -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">Supplier Risk · Region</span>
+    </div>
+    <div class="card-body" id="risk-region" style="padding:8px;">
+      <div class="skeleton" style="height:12px;margin-bottom:8px;"></div>
+      <div class="skeleton" style="height:12px;margin-bottom:8px;width:80%;"></div>
+      <div class="skeleton" style="height:12px;margin-bottom:8px;width:65%;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Agent pipeline status strip -->
+<div class="card mb-16">
+  <div class="card-header">
+    <span class="card-title">Process-Aware Agentic Loop</span>
+    <span class="badge blue" id="pipeline-status">ACTIVE</span>
+  </div>
+  <div class="flow-diagram">
+    <div class="flow-step active">Deviation<br>Detected</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">OCEL Context<br>Retrieval</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">LangGraph<br>Agent</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">Risk<br>Evaluation</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">Action<br>Selection</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">Human<br>Approval</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">Execution &amp;<br>Resolution</div>
+  </div>
+</div>
+
+<!-- Active Deviations Table -->
+<div class="card mb-16">
+  <div class="card-header">
+    <span class="card-title">Active Deviations</span>
+    <a href="/deviations" class="btn btn-ghost btn-sm">View all →</a>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Type</th>
+          <th>Supplier</th>
+          <th>Severity</th>
+          <th>Exposure (USD)</th>
+          <th>Customers Affected</th>
+          <th>Detected</th>
+          <th>Agent</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="deviations-tbody">
+        <tr><td colspan="9" style="padding:20px;text-align:center;color:var(--text-muted);">Loading...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Deviation Type Breakdown -->
+<div class="card">
+  <div class="card-header"><span class="card-title">Deviation Type Breakdown</span></div>
+  <div class="card-body" id="dev-type-breakdown" style="padding:8px 18px;">
+    <div class="skeleton" style="height:12px;margin-bottom:8px;"></div>
+    <div class="skeleton" style="height:12px;margin-bottom:8px;width:70%;"></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ asset('js/charts.js') }}"></script>
+<script src="{{ asset('js/dashboard.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Action Centre{% endblock %}
+{% block page_title %}Action Centre{% endblock %}
+{% block page_sub %}Review and act on agent recommendations{% endblock %}
+
+{% block content %}
+<div class="tabs">
+  <div class="tab active" onclick="loadRecs('pending',this)">Pending Approval</div>
+  <div class="tab" onclick="loadRecs('approved',this)">Approved</div>
+  <div class="tab" onclick="loadRecs('rejected',this)">Rejected</div>
+</div>
+
+<div id="recs-container">
+  <div style="padding:40px;text-align:center;color:var(--text-muted);">Loading...</div>
+</div>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ asset('js/action_centre.js') }}"></script>
+{% endblock %}
