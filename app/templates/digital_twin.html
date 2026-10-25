@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Digital Twin{% endblock %}
+{% block page_title %}Supply Chain Digital Twin{% endblock %}
+{% block page_sub %}Interactive dependency graph · Suppliers → POs → Customer Orders → Customers{% endblock %}
+
+{% block head %}
+<style>
+#graph-canvas { width:100%; height:600px; background:var(--bg-surface); border-radius:var(--radius-lg); border:1px solid var(--border); overflow:hidden; }
+.node-tooltip {
+  position:absolute; pointer-events:none;
+  background:var(--bg-raised); border:1px solid var(--border-light);
+  border-radius:var(--radius); padding:8px 12px;
+  font-size:11px; font-family:var(--font-mono);
+  color:var(--text-primary); z-index:1000;
+  max-width:260px; line-height:1.5;
+  box-shadow:var(--shadow-lg);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="display:flex;gap:12px;margin-bottom:14px;align-items:center;">
+  <div class="card" style="padding:6px 14px;font-size:11px;display:flex;align-items:center;gap:12px;">
+    <span style="display:flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;border-radius:50%;background:#3e7230;display:inline-block;"></span> Supplier</span>
+    <span style="display:flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;border-radius:50%;background:#b9c7ad;display:inline-block;"></span> Purchase Order</span>
+    <span style="display:flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;border-radius:50%;background:#c4e0a8;display:inline-block;"></span> Customer Order</span>
+    <span style="display:flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;border-radius:50%;background:#c99a1f;display:inline-block;"></span> Customer</span>
+    <span style="display:flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;border-radius:50%;background:#dc5643;display:inline-block;"></span> ⚠ Deviation</span>
+  </div>
+  <div style="margin-left:auto;display:flex;gap:8px;">
+    <select id="limit-select" onchange="reloadGraph()"
+      style="background:var(--bg-raised);border:1px solid var(--border);color:var(--text-secondary);
+             padding:6px 10px;border-radius:var(--radius);font-size:12px;outline:none;">
+      <option value="60">60 nodes</option>
+      <option value="80" selected>80 nodes</option>
+      <option value="120">120 nodes</option>
+    </select>
+    <button class="btn btn-ghost btn-sm" onclick="resetZoom()">Reset View</button>
+  </div>
+</div>
+
+<div id="graph-canvas"></div>
+<div id="graph-stats" style="margin-top:10px;font-size:11px;color:var(--text-muted);font-family:var(--font-mono);text-align:right;"></div>
+<div class="node-tooltip" id="graph-tooltip" style="display:none;"></div>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ asset('js/digital_twin.js') }}"></script>
+{% endblock %}

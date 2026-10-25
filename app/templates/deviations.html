@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Deviations{% endblock %}
+{% block page_title %}Process Deviations{% endblock %}
+{% block page_sub %}Conformance violations detected from supply chain event logs{% endblock %}
+
+{% block content %}
+<div class="flex items-center gap-12 mb-16" style="justify-content:space-between;">
+  <div class="tabs" style="margin-bottom:0;">
+    <div class="tab active" data-filter="0" onclick="setFilter(0, this)">Active</div>
+    <div class="tab" data-filter="1" onclick="setFilter(1, this)">Resolved</div>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center;">
+    <select id="source-filter" onchange="loadDeviations(currentResolved)"
+      style="background:var(--bg-raised);border:1px solid var(--border);color:var(--text-secondary);
+             padding:6px 10px;border-radius:var(--radius);font-size:12px;outline:none;">
+      <option value="">All Sources</option>
+      <option value="synthetic">Synthetic Seed</option>
+      <option value="dataco">Kaggle · DataCo</option>
+      <option value="scms">Kaggle · USAID SCMS</option>
+    </select>
+    <select id="type-filter" onchange="applyFilters()"
+      style="background:var(--bg-raised);border:1px solid var(--border);color:var(--text-secondary);
+             padding:6px 10px;border-radius:var(--radius);font-size:12px;outline:none;">
+      <option value="">All Types</option>
+      <option value="late_delivery">Late Delivery</option>
+      <option value="invoice_mismatch">Invoice Mismatch</option>
+      <option value="goods_receipt_skip">GR Skip</option>
+      <option value="customs_hold">Customs Hold</option>
+      <option value="quality_rejection">Quality Rejection</option>
+      <option value="supplier_blackout">Supplier Blackout</option>
+      <option value="suspected_fraud">Suspected Fraud</option>
+    </select>
+    <select id="sev-filter" onchange="applyFilters()"
+      style="background:var(--bg-raised);border:1px solid var(--border);color:var(--text-secondary);
+             padding:6px 10px;border-radius:var(--radius);font-size:12px;outline:none;">
+      <option value="">All Severities</option>
+      <option value="critical">Critical</option>
+      <option value="high">High</option>
+      <option value="medium">Medium</option>
+      <option value="low">Low</option>
+    </select>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <span class="card-title" id="table-title">Active Deviations</span>
+    <span class="text-muted" id="row-count" style="font-size:11px;font-family:var(--font-mono);">Loading...</span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>PO Reference</th>
+          <th>Deviation Type</th>
+          <th>Supplier</th>
+          <th>Country</th>
+          <th>Severity</th>
+          <th>Exposure (USD)</th>
+          <th>Delay (d)</th>
+          <th>Customers</th>
+          <th>Detected</th>
+          <th>Agent</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="dev-tbody">
+        <tr><td colspan="12" style="padding:24px;text-align:center;color:var(--text-muted);">Loading...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ asset('js/deviations.js') }}"></script>
+{% endblock %}

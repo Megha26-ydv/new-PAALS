@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Deviation Detail{% endblock %}
+{% block page_title %}Deviation Detail{% endblock %}
+{% block page_sub %}Process deviation record & agent analysis{% endblock %}
+
+{% block content %}
+<div style="margin-bottom:12px;">
+  <a href="/deviations" class="btn btn-ghost btn-sm">← Back to Deviations</a>
+</div>
+
+<div id="dev-container">
+  <div style="padding:40px;text-align:center;color:var(--text-muted);font-size:13px;">Loading deviation...</div>
+</div>
+{% endblock %}
+
+
+{% block scripts %}
+<script>
+// DEV_ID injected by Jinja — must be defined before the external script loads
+const DEV_ID = "{{ dev_id }}";
+</script>
+<script src="{{ asset('js/deviation_detail.js') }}"></script>
+{% endblock %}

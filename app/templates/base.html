@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}PAALS{% endblock %} — Supply Chain Oversight</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.ico">
+  <link rel="stylesheet" href="{{ asset('css/main.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/motion.css') }}">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+  {% block head %}{% endblock %}
+</head>
+<body data-page="{{ request.url.path.strip('/').split('/')[0] or 'dashboard' }}">
+
+<div class="ambient current" aria-hidden="true"></div>
+
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="wordmark">PAALS</div>
+    <div class="tagline">Process-Aware Agentic<br>Loop — Supply Chain</div>
+  </div>
+  <div class="sidebar-status">
+    <div class="status-dot"></div>
+    <span>OPERATIONS LIVE</span>
+  </div>
+  <nav>
+    <div class="nav-section">Monitoring</div>
+    <a href="/" class="nav-link {% if request.url.path == '/' %}active{% endif %}">
+      <span class="icon">◈</span> Executive Dashboard
+    </a>
+    <a href="/deviations" class="nav-link {% if '/deviations' in request.url.path %}active{% endif %}">
+      <span class="icon">⚠</span> Deviations
+      <span class="nav-badge" id="nav-dev-count">—</span>
+    </a>
+    <a href="/digital-twin" class="nav-link {% if request.url.path == '/digital-twin' %}active{% endif %}">
+      <span class="icon">⬡</span> Digital Twin
+    </a>
+
+    <div class="nav-section">Operations</div>
+    <a href="/action-centre" class="nav-link {% if request.url.path == '/action-centre' %}active{% endif %}">
+      <span class="icon">◉</span> Action Centre
+      <span class="nav-badge" id="nav-approval-count">—</span>
+    </a>
+    <a href="/purchase-orders" class="nav-link {% if request.url.path == '/purchase-orders' %}active{% endif %}">
+      <span class="icon">◫</span> Purchase Orders
+    </a>
+    <a href="/suppliers" class="nav-link {% if request.url.path == '/suppliers' %}active{% endif %}">
+      <span class="icon">⬚</span> Suppliers
+    </a>
+
+    <div class="nav-section">System</div>
+    <a href="/research" class="nav-link {% if request.url.path == '/research' %}active{% endif %}">
+      <span class="icon">∷</span> Research Mode
+    </a>
+  </nav>
+  <div class="sidebar-footer">
+    v1.0.0 · Research Prototype
+  </div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-crumb">PAALS<span>/</span><b>{% block page_title %}Dashboard{% endblock %}</b></div>
+    <div class="topbar-right">
+      <div class="topbar-time" id="topbar-clock">—</div>
+    </div>
+  </div>
+
+  <div class="content">
+    <header class="page-hero">
+      <h1>{{ self.page_title() }}</h1>
+      <p>{% block page_sub %}{% endblock %}</p>
+    </header>
+    {% block content %}{% endblock %}
+  </div>
+</div>
+
+<script>
+  // Live clock
+  function updateClock() {
+    const now = new Date();
+    document.getElementById('topbar-clock').textContent =
+      now.toUTCString().replace('GMT', 'UTC');
+  }
+  updateClock();
+  setInterval(updateClock, 1000);
+
+  // Update nav badges from API
+  async function refreshNavBadges() {
+    try {
+      const data = await fetch('/api/dashboard').then(r => r.json());
+      const devEl = document.getElementById('nav-dev-count');
+      const appEl = document.getElementById('nav-approval-count');
+      if (devEl) devEl.textContent = data.active_deviations || '0';
+      if (appEl) appEl.textContent = data.pending_approvals || '0';
+    } catch (e) {}
+  }
+  refreshNavBadges();
+  setInterval(refreshNavBadges, 30000);
+</script>
+<script src="{{ asset('js/motion.js') }}"></script>
+
+{% block scripts %}{% endblock %}
+</body>
+</html>

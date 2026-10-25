@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% block title %}Suppliers{% endblock %}
+{% block page_title %}Supplier Registry{% endblock %}
+{% block page_sub %}Synthetic suppliers + Kaggle DataCo fulfilment lanes · Strategic tier classification{% endblock %}
+
+{% block head %}
+<style>
+.tier-bar {
+  display: flex; gap: 1px; height: 4px; border-radius: 2px; overflow: hidden; width: 48px;
+}
+.tier-seg { flex: 1; background: var(--border); border-radius: 1px; }
+.tier-seg.filled { background: var(--accent-blue); }
+.tier-1 .tier-seg.filled { background: var(--critical); }
+.tier-2 .tier-seg.filled { background: var(--high); }
+.tier-3 .tier-seg.filled { background: var(--medium); }
+
+.rel-bar {
+  height: 4px; border-radius: 2px; background: var(--bg-raised); overflow: hidden; width: 60px;
+}
+.rel-fill { height: 100%; border-radius: 2px; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Summary metrics -->
+<div class="metrics-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px;">
+  <div class="metric-card critical">
+    <div class="metric-label">Tier 1 · Strategic</div>
+    <div class="metric-value" id="m-tier1">—</div>
+    <div class="metric-sub">Critical dependency suppliers</div>
+  </div>
+  <div class="metric-card high">
+    <div class="metric-label">Tier 2 · Preferred</div>
+    <div class="metric-value" id="m-tier2">—</div>
+    <div class="metric-sub">Preferred sourcing base</div>
+  </div>
+  <div class="metric-card medium">
+    <div class="metric-label">Tier 3 · Standard</div>
+    <div class="metric-value" id="m-tier3">—</div>
+    <div class="metric-sub">Transactional suppliers</div>
+  </div>
+  <div class="metric-card blue">
+    <div class="metric-label">With Active Deviation</div>
+    <div class="metric-value" id="m-with-dev">—</div>
+    <div class="metric-sub">Requiring attention</div>
+  </div>
+</div>
+
+<!-- Filter bar -->
+<div style="display:flex;gap:10px;align-items:center;margin-bottom:14px;">
+  <select id="source-filter" onchange="applyFilter()"
+    style="background:var(--bg-raised);border:1px solid var(--border);color:var(--text-secondary);
+           padding:6px 10px;border-radius:var(--radius);font-size:12px;outline:none;">
+    <option value="">All Sources</option>
+    <option value="synthetic">Synthetic Seed</option>
+    <option value="dataco">Kaggle · DataCo Lanes</option>
+    <option value="scms">Kaggle · SCMS Vendors</option>
+  </select>
+  <select id="tier-filter" onchange="applyFilter()"
+    style="background:var(--bg-raised);border:1px solid var(--border);color:var(--text-secondary);
+           padding:6px 10px;border-radius:var(--radius);font-size:12px;outline:none;">
+    <option value="">All Tiers</option>
+    <option value="1">Tier 1 — Strategic</option>
+    <option value="2">Tier 2 — Preferred</option>
+    <option value="3">Tier 3 — Standard</option>
+  </select>
+  <select id="region-filter" onchange="applyFilter()"
+    style="background:var(--bg-raised);border:1px solid var(--border);color:var(--text-secondary);
+           padding:6px 10px;border-radius:var(--radius);font-size:12px;outline:none;">
+    <option value="">All Regions</option>
+  </select>
+  <select id="dev-filter" onchange="applyFilter()"
+    style="background:var(--bg-raised);border:1px solid var(--border);color:var(--text-secondary);
+           padding:6px 10px;border-radius:var(--radius);font-size:12px;outline:none;">
+    <option value="">All Suppliers</option>
+    <option value="1">With Active Deviations</option>
+    <option value="0">No Active Deviations</option>
+  </select>
+  <span style="margin-left:auto;font-size:11px;color:var(--text-muted);font-family:var(--font-mono);" id="row-count">—</span>
+</div>
+
+<!-- Main table -->
+<div class="card mb-16">
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Supplier Name</th>
+          <th>Country</th>
+          <th>Region</th>
+          <th>Tier</th>
+          <th>Lead Time</th>
+          <th>Reliability</th>
+          <th>Annual Spend</th>
+          <th>Active Dev.</th>
+          <th>Exposure (USD)</th>
+          <th>Categories</th>
+          <th>Currency</th>
+        </tr>
+      </thead>
+      <tbody id="supplier-tbody">
+        <tr><td colspan="12" style="padding:24px;text-align:center;color:var(--text-muted);">Loading...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Spend by region breakdown -->
+<div class="grid-2">
+  <div class="card">
+    <div class="card-header"><span class="card-title">Annual Spend by Region</span></div>
+    <div class="card-body" id="spend-by-region" style="padding:8px 16px;"></div>
+  </div>
+  <div class="card">
+    <div class="card-header"><span class="card-title">Reliability Distribution</span></div>
+    <div class="card-body" id="reliability-dist" style="padding:8px 16px;"></div>
+  </div>
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+<script src="{{ asset('js/suppliers.js') }}"></script>
+{% endblock %}
